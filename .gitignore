@@ -31,3 +31,5 @@ ny_taxi_postgres_data
 
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
+
+.DS_Store
