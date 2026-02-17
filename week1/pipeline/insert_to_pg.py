@@ -37,4 +37,4 @@ df = pd.read_csv(
 )
 
 # still cant run
-print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
+# print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
