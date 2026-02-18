@@ -36,5 +36,5 @@ df = pd.read_csv(
     parse_dates=parse_dates
 )
 
-# still cant run
+# still cant run, help
 print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
