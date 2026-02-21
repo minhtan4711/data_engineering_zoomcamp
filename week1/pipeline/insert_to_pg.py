@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from pathlib import Path
+from tqdm.auto import tqdm
 
 data_path = Path("data/yellow_tripdata_2021-01.csv.gz")
 engine = create_engine('postgresql+psycopg://root:root@localhost:5432/ny_taxi')
@@ -36,4 +37,46 @@ df = pd.read_csv(
     parse_dates=parse_dates
 )
 
+# get ddl schema
 print(pd.io.sql.get_schema(df, name='yellow_taxi_data', con=engine))
+
+# # create the table
+df.head(n=0).to_sql(name='yellow_taxi_data', con=engine, if_exists='replace')
+# # head(n=0) make sure we only create table, not add any data yet
+
+
+# # insert data in chunks
+df_iter = pd.read_csv(
+    data_path,
+    dtype=dtype,
+    parse_dates=parse_dates,
+    iterator=True,
+    chunksize=100000
+)
+
+first_chunk = next(df_iter)
+
+# create table
+first_chunk.head(0).to_sql(
+    name="yellow_taxi_data",
+    con=engine,
+    if_exists="replace"
+)
+
+print("Table created")
+
+first_chunk.to_sql(
+    name="yellow_taxi_data",
+    con=engine,
+    if_exists="append"
+)
+
+print("Inserted first chunk:", len(first_chunk))
+
+for df_chunk in tqdm(df_iter):
+    df_chunk.to_sql(
+        name="yellow_taxi_data",
+        con=engine,
+        if_exists="append"
+    )
+    print("Inserted chunk:", len(df_chunk))
